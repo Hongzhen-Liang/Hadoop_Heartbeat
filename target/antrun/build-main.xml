@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main" if="tar">
+  <echo file="/opt/module/hadoop-3.3.1-src/hadoop-hdfs-project/hadoop-hdfs/target/dist-maketar.sh">cd &quot;/opt/module/hadoop-3.3.1-src/hadoop-hdfs-project/hadoop-hdfs/target&quot;
+                      tar cf - hadoop-hdfs-3.3.1 | gzip &gt; hadoop-hdfs-3.3.1.tar.gz</echo>
+  <exec failonerror="true" dir="/opt/module/hadoop-3.3.1-src/hadoop-hdfs-project/hadoop-hdfs/target" executable="bash">
+    <arg line="./dist-maketar.sh"/>
+  </exec>
+</target>
+</project>

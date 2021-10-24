@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/dev-support/dev-support.iml" filepath="$PROJECT_DIR$/dev-support/dev-support.iml" />
+      <module fileurl="file://$PROJECT_DIR$/target/generated-sources/generated-sources.iml" filepath="$PROJECT_DIR$/target/generated-sources/generated-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/hadoop-hdfs.iml" filepath="$PROJECT_DIR$/.idea/hadoop-hdfs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/target/hadoop-hdfs-3.3.1/hadoop-hdfs-3.3.1.iml" filepath="$PROJECT_DIR$/target/hadoop-hdfs-3.3.1/hadoop-hdfs-3.3.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/main/main.iml" filepath="$PROJECT_DIR$/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/test/test.iml" filepath="$PROJECT_DIR$/src/test/test.iml" />
+    </modules>
+  </component>
+</project>
