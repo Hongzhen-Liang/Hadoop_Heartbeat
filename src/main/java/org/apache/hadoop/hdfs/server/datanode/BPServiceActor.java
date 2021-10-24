@@ -159,6 +159,15 @@ class BPServiceActor implements Runnable {
     return ibrManager;
   }
 
+
+  /**
+   * Author: Hongzhen Liang
+   * @return
+   */
+  public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+    scheduler.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
+  }
+
   boolean isAlive() {
     if (!shouldServiceRun || !bpThread.isAlive()) {
       return false;
@@ -539,6 +548,9 @@ class BPServiceActor implements Runnable {
         outliersReportDue && dn.getDiskMetrics() != null ?
             SlowDiskReports.create(dn.getDiskMetrics().getDiskOutliersStats()) :
             SlowDiskReports.EMPTY_REPORT;
+
+    //Author: Hongzhen Liang
+    System.out.println("Send Heartbeat:"+new java.util.Date());
 
     HeartbeatResponse response = bpNamenode.sendHeartbeat(bpRegistration,
         reports,
@@ -1137,10 +1149,13 @@ class BPServiceActor implements Runnable {
     private final AtomicBoolean forceFullBlockReport =
         new AtomicBoolean(false);
 
-    private final long heartbeatIntervalMs;
+//    private final long heartbeatIntervalMs;
+    private long heartbeatIntervalMs;
     private final long lifelineIntervalMs;
     private final long blockReportIntervalMs;
     private final long outliersReportIntervalMs;
+
+
 
     Scheduler(long heartbeatIntervalMs, long lifelineIntervalMs,
               long blockReportIntervalMs, long outliersReportIntervalMs) {
@@ -1149,6 +1164,15 @@ class BPServiceActor implements Runnable {
       this.blockReportIntervalMs = blockReportIntervalMs;
       this.outliersReportIntervalMs = outliersReportIntervalMs;
       scheduleNextLifeline(nextHeartbeatTime);
+    }
+
+
+    /**
+     * Author: Hongzhen Liang
+     * @return
+     */
+    public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+      this.heartbeatIntervalMs = heartbeatIntervalSeconds * 1000;
     }
 
     // This is useful to make sure NN gets Heartbeat before Blockreport

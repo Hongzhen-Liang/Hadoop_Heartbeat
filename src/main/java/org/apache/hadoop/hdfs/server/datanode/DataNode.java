@@ -54,19 +54,10 @@ import static org.apache.hadoop.util.ExitUtil.terminate;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.hdfs.protocol.proto.ReconfigurationProtocolProtos.ReconfigurationProtocolService;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.channels.ServerSocketChannel;
@@ -1151,6 +1142,76 @@ public class DataNode extends ReconfigurableBase
     }
   }
 
+
+  //Author:Hongzhen Liang
+  private Thread outerHearbeatServer = null;
+  class OuterHearbeatServer implements Runnable {
+    private Thread t;
+    private String threadName;
+
+    OuterHearbeatServer(String name) {
+      threadName = name;
+      System.out.println("Creating " + threadName);
+    }
+
+    public void run() {
+      try {
+        ServerSocket server = new ServerSocket(9527);
+        while (true) {
+          Socket socket = server.accept();
+          BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          String line = is.readLine();
+          System.out.println("new HeartbeatInterval:" + line);
+
+          PrintWriter pw = new PrintWriter(socket.getOutputStream());
+          pw.println("accept new HeartbeatInterval " + line);
+          pw.flush();
+
+          Configuration conf = getConf();
+          int heartbeatRecheckInterval = conf.getInt(
+                  DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY,
+                  DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_DEFAULT);
+//          long heartbeatIntervalSeconds = conf.getTimeDuration(
+//                  DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY,
+//                  DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_DEFAULT, TimeUnit.SECONDS);
+
+
+          long heartbeatIntervalSeconds = 1;
+          blockPoolManager.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
+//          for(BPOfferService bp:blockPoolManager.getAllNamenodeThreads()) {
+//            System.out.println(bp);
+//            bp.getNameserviceId();
+//          }
+          //System.out.println(blockPoolManager);
+
+
+          pw.close();
+          is.close();
+          socket.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+        //server.close();
+      }
+    }
+
+    public void start() {
+      System.out.println("Starting " + threadName);
+      if (t == null) {
+        t = new Thread(this, threadName);
+        t.start();
+      }
+    }
+  }
+  private void initOuterHearbeatServer() throws IOException{
+    this.outerHearbeatServer = new Thread(new OuterHearbeatServer("OuterHearbeatServer"));
+    this.outerHearbeatServer.setDaemon(true);
+  }
+
+
+
+
+
   private void initDataXceiver() throws IOException {
     // find free port or use privileged port provided
     TcpPeerServer tcpPeerServer;
@@ -1423,6 +1484,7 @@ public class DataNode extends ReconfigurableBase
     // global DN settings
     registerMXBean();
     initDataXceiver();
+    initOuterHearbeatServer();
     startInfoServer();
     pauseMonitor = new JvmPauseMonitor();
     pauseMonitor.init(getConf());
@@ -2722,6 +2784,8 @@ public class DataNode extends ReconfigurableBase
     ipcServer.setTracer(tracer);
     ipcServer.start();
     startPlugins(getConf());
+    //Author: Hongzhen Liang
+    outerHearbeatServer.start();
   }
 
   /**

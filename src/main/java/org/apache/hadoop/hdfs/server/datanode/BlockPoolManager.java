@@ -60,6 +60,13 @@ class BlockPoolManager {
   BlockPoolManager(DataNode dn) {
     this.dn = dn;
   }
+
+  //Author:Hongzhen Liang
+  public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+    for(BPOfferService of:offerServices){
+      of.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
+    }
+  }
   
   synchronized void addBlockPool(BPOfferService bpos) {
     Preconditions.checkArgument(offerServices.contains(bpos),

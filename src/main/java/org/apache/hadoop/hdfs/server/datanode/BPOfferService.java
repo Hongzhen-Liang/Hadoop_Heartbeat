@@ -173,6 +173,15 @@ class BPOfferService {
   }
 
   /**
+   * Author: Hongzhen Liang
+   */
+  public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+    for(BPServiceActor actor : bpServices){
+      actor.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
+    }
+  }
+
+  /**
    * @return true if the service has registered with at least one NameNode.
    */
   boolean isInitialized() {
