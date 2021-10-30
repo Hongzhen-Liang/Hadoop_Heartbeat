@@ -858,6 +858,12 @@ public class DatanodeManager {
     }
   }
 
+  //Author:Hongzhen Liang
+  public void setHeartbeat(String uid,long heartbeatInterval) {
+    this.heartbeatManager.setHeartbeat(uid,heartbeatInterval);
+  }
+
+
   //Author: Hongzhen Liang
   /** Is the datanode dead? */
   boolean isDatanodeDead(DatanodeDescriptor node) {

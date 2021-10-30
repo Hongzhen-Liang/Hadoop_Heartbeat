@@ -17,12 +17,16 @@
  */
 package org.apache.hadoop.hdfs.server.namenode;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.thirdparty.com.google.common.annotations.VisibleForTesting;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Sets;
 
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,8 +108,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.ObjectName;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.security.PrivilegedExceptionAction;
@@ -715,6 +717,62 @@ public class NameNode extends ReconfigurableBase implements
     SecurityUtil.login(conf, DFS_NAMENODE_KEYTAB_FILE_KEY,
         DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY, socAddr.getHostName());
   }
+
+  //Author: Hongzhen Liang
+  private Thread outerHearbeatServer = null;
+  class OuterHearbeatServer implements Runnable {
+    private Thread t;
+    private String threadName;
+
+    OuterHearbeatServer(String name){
+      threadName = name;
+      System.out.println("Creating " + threadName);
+    }
+
+    public void run(){
+      try{
+        ServerSocket server = new ServerSocket(9528);
+        while(true){
+          Socket socket = server.accept();
+          BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          String line = is.readLine();
+
+          String uuid = line.split(" ")[0];
+          long heartbeatInterval = Long.parseLong(line.split(" ")[1]);
+
+
+          System.out.println("Changed node is "+uuid);
+          System.out.println("New HeartbeatInterval+Recheck:" + heartbeatInterval);
+
+//          long heartbeatIntervalSeconds = Long.parseLong(line);
+
+          PrintWriter pw = new PrintWriter(socket.getOutputStream());
+          pw.println("accept new HeartbeatInterval+Recheck: "+heartbeatInterval);
+          pw.flush();
+
+          pw.close();
+          is.close();
+          socket.close();
+        }
+      }
+      catch (IOException e){
+        e.printStackTrace();
+        //server.close();
+      }
+    }
+
+    public void start(){
+      System.out.println("Starting "+threadName);
+      if(t==null){
+        t = new Thread(this, threadName);
+        t.start();
+      }
+    }
+  }
+
+
+
+
   
   /**
    * Initialize name-node.
@@ -786,6 +844,12 @@ public class NameNode extends ReconfigurableBase implements
 
     startCommonServices(conf);
     startMetricsLogger(conf);
+    //Author: Hongzhen Liang
+    this.outerHearbeatServer = new Thread(new NameNode.OuterHearbeatServer("OuterHearbeatServer"));
+    this.outerHearbeatServer.setDaemon(true);
+    //Author: Hongzhen Liang
+    outerHearbeatServer.start();
+
   }
 
   @VisibleForTesting

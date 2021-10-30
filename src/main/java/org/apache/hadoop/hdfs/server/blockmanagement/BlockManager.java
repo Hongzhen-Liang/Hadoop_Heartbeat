@@ -2652,6 +2652,12 @@ public class BlockManager implements BlockStatsMXBean {
     }
   }
 
+  //Author: Hongzhen Liang
+  public void setHeartbeat(String uid,long heartbeatInterval){
+    datanodeManager.setHeartbeat(uid,heartbeatInterval);
+
+  }
+
   public long getProvidedCapacity() {
     return providedStorageMap.getCapacity();
   }

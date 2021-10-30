@@ -125,6 +125,16 @@ class HeartbeatManager implements DatanodeStatistics {
     return datanodes.size();
   }
 
+  //Author: Hongzhen Liang
+  public void setHeartbeat(String uid,long heartbeatInterval){
+    for(DatanodeDescriptor d:datanodes){
+      if(d.getDatanodeUuid() == uid){
+        d.setHeartbeatExpireInterval(heartbeatInterval);
+        System.out.println(uid+"'s HeartbeatExpireInterval changes to "+heartbeatInterval);
+      }
+    }
+  }
+
   @Override
   public long getCapacityTotal() {
     return stats.getCapacityTotal();

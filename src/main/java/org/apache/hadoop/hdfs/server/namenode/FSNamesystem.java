@@ -703,6 +703,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     return haEnabled;
   }
 
+  //Author:Hongzhen Liang
+  public void setHeartbeat(String uid,long heartbeatInterval){
+    this.blockManager.setHeartbeat(uid,heartbeatInterval);
+  }
+
   /**
    * Check the supplied configuration for correctness.
    * @param conf Supplies the configuration to validate.
