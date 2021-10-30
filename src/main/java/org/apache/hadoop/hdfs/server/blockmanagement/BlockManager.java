@@ -2653,8 +2653,8 @@ public class BlockManager implements BlockStatsMXBean {
   }
 
   //Author: Hongzhen Liang
-  public void setHeartbeat(String uid,long heartbeatInterval){
-    datanodeManager.setHeartbeat(uid,heartbeatInterval);
+  public void setHeartbeat(String uid,long heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+    datanodeManager.setHeartbeat(uid,heartbeatRecheckInterval,heartbeatIntervalSeconds);
 
   }
 

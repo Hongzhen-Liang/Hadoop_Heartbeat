@@ -704,8 +704,8 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   //Author:Hongzhen Liang
-  public void setHeartbeat(String uid,long heartbeatInterval){
-    this.blockManager.setHeartbeat(uid,heartbeatInterval);
+  public void setHeartbeat(String uid,long heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+    this.blockManager.setHeartbeat(uid,heartbeatRecheckInterval,heartbeatIntervalSeconds);
   }
 
   /**

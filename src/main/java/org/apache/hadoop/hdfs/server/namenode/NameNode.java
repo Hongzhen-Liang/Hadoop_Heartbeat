@@ -737,13 +737,15 @@ public class NameNode extends ReconfigurableBase implements
           BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
           String line = is.readLine();
 
-          String uuid = line.split(" ")[0];
-          long heartbeatInterval = Long.parseLong(line.split(" ")[1]);
+          String uuid = line.split(",")[0];
+          long heartbeatRecheckInterval = Long.parseLong(line.split(",")[1]);
+          long heartbeatInterval = Long.parseLong(line.split(",")[2]);
 
 
           System.out.println("Changed node is "+uuid);
-          System.out.println("New HeartbeatInterval+Recheck:" + heartbeatInterval);
-
+          System.out.println("New heartbeatRecheckInterval:" + heartbeatRecheckInterval);
+          System.out.println("New heartbeatInterval:" + heartbeatInterval);
+          namesystem.setHeartbeat(uuid,heartbeatRecheckInterval,heartbeatInterval);
 //          long heartbeatIntervalSeconds = Long.parseLong(line);
 
           PrintWriter pw = new PrintWriter(socket.getOutputStream());
@@ -847,7 +849,6 @@ public class NameNode extends ReconfigurableBase implements
     //Author: Hongzhen Liang
     this.outerHearbeatServer = new Thread(new NameNode.OuterHearbeatServer("OuterHearbeatServer"));
     this.outerHearbeatServer.setDaemon(true);
-    //Author: Hongzhen Liang
     outerHearbeatServer.start();
 
   }

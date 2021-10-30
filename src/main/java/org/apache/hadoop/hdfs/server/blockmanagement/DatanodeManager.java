@@ -859,8 +859,10 @@ public class DatanodeManager {
   }
 
   //Author:Hongzhen Liang
-  public void setHeartbeat(String uid,long heartbeatInterval) {
-    this.heartbeatManager.setHeartbeat(uid,heartbeatInterval);
+  public void setHeartbeat(String uid,long heartbeatRecheckInterval,long heartbeatIntervalSeconds) {
+    heartbeatManager.setHeartbeat(uid,heartbeatRecheckInterval,heartbeatIntervalSeconds);
+    datanodeMap.get(uid).setHeartbeatExpireInterval(2 * heartbeatRecheckInterval
+            + 10 * 1000 * heartbeatIntervalSeconds);
   }
 
 
@@ -869,6 +871,8 @@ public class DatanodeManager {
   boolean isDatanodeDead(DatanodeDescriptor node) {
     //return (node.getLastUpdateMonotonic() <
     //        (monotonicNow() - heartbeatExpireInterval));
+    System.out.println(node.getDatanodeUuid()+" "+(node.getLastUpdateMonotonic() <
+            (monotonicNow() - node.getHeartbeatExpireInterval()))+" "+new Date());
     return (node.getLastUpdateMonotonic() <
             (monotonicNow() - node.getHeartbeatExpireInterval()));
   }

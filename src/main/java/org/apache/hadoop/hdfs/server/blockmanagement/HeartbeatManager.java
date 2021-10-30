@@ -67,7 +67,8 @@ class HeartbeatManager implements DatanodeStatistics {
   private final DatanodeStats stats = new DatanodeStats();
 
   /** The time period to check for expired datanodes. */
-  private final long heartbeatRecheckInterval;
+  //Author:Hongzhen Liang
+  private long heartbeatRecheckInterval;
   /** Heartbeat monitor thread. */
   private final Daemon heartbeatThread = new Daemon(new Monitor());
   private final StopWatch heartbeatStopWatch = new StopWatch();
@@ -125,12 +126,14 @@ class HeartbeatManager implements DatanodeStatistics {
     return datanodes.size();
   }
 
-  //Author: Hongzhen Liang
-  public void setHeartbeat(String uid,long heartbeatInterval){
+  //Author:Hongzhen Liang
+  public void setHeartbeat(String uid,long heartbeatRecheckInterval,long heartbeatIntervalSeconds) {
+    this.heartbeatRecheckInterval = heartbeatRecheckInterval;
     for(DatanodeDescriptor d:datanodes){
-      if(d.getDatanodeUuid() == uid){
-        d.setHeartbeatExpireInterval(heartbeatInterval);
-        System.out.println(uid+"'s HeartbeatExpireInterval changes to "+heartbeatInterval);
+      if(d.getDatanodeUuid().equals(uid)){
+        long heartbeatExpireInterval = 2 * heartbeatRecheckInterval
+                + 10 * 1000 * heartbeatIntervalSeconds;
+        d.setHeartbeatExpireInterval(heartbeatExpireInterval);
       }
     }
   }
@@ -457,6 +460,7 @@ class HeartbeatManager implements DatanodeStatistics {
             return;
           }
           if (dead == null && dm.isDatanodeDead(d)) {
+            //Author: Hongzhen Liang
             stats.incrExpiredHeartbeats();
             dead = d;
             // remove the node from stale list to adjust the stale list size
