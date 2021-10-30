@@ -62,9 +62,9 @@ class BlockPoolManager {
   }
 
   //Author:Hongzhen Liang
-  public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+  public void setHeartbeat(long heartbeatIntervalSeconds){
     for(BPOfferService of:offerServices){
-      of.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
+      of.setHeartbeat(heartbeatIntervalSeconds);
     }
   }
   

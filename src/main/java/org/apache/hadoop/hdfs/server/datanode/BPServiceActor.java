@@ -164,8 +164,8 @@ class BPServiceActor implements Runnable {
    * Author: Hongzhen Liang
    * @return
    */
-  public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
-    scheduler.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
+  public void setHeartbeat(long heartbeatIntervalSeconds){
+    scheduler.setHeartbeat(heartbeatIntervalSeconds);
   }
 
   boolean isAlive() {
@@ -1171,7 +1171,7 @@ class BPServiceActor implements Runnable {
      * Author: Hongzhen Liang
      * @return
      */
-    public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+    public void setHeartbeat(long heartbeatIntervalSeconds){
       this.heartbeatIntervalMs = heartbeatIntervalSeconds * 1000;
     }
 

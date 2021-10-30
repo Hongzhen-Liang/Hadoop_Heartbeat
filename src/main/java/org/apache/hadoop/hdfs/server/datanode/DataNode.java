@@ -1167,23 +1167,16 @@ public class DataNode extends ReconfigurableBase
           pw.println("accept new HeartbeatInterval " + line);
           pw.flush();
 
-          Configuration conf = getConf();
-          int heartbeatRecheckInterval = conf.getInt(
-                  DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY,
-                  DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_DEFAULT);
-//          long heartbeatIntervalSeconds = conf.getTimeDuration(
-//                  DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY,
-//                  DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_DEFAULT, TimeUnit.SECONDS);
-
-
-          long heartbeatIntervalSeconds = 1;
-          blockPoolManager.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
-//          for(BPOfferService bp:blockPoolManager.getAllNamenodeThreads()) {
-//            System.out.println(bp);
-//            bp.getNameserviceId();
-//          }
-          //System.out.println(blockPoolManager);
-
+          long heartbeatIntervalSeconds;
+          try {
+            heartbeatIntervalSeconds = Long.parseLong(line);
+          }catch (Exception e) {
+            Configuration conf = getConf();
+            heartbeatIntervalSeconds = conf.getTimeDuration(
+                    DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY,
+                    DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_DEFAULT, TimeUnit.SECONDS);
+          }
+          blockPoolManager.setHeartbeat(heartbeatIntervalSeconds);
 
           pw.close();
           is.close();
@@ -1484,6 +1477,7 @@ public class DataNode extends ReconfigurableBase
     // global DN settings
     registerMXBean();
     initDataXceiver();
+    //Author:Hongzhen Liang
     initOuterHearbeatServer();
     startInfoServer();
     pauseMonitor = new JvmPauseMonitor();

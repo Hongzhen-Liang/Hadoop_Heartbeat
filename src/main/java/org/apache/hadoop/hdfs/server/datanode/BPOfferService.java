@@ -175,9 +175,9 @@ class BPOfferService {
   /**
    * Author: Hongzhen Liang
    */
-  public void setHeartbeat(int heartbeatRecheckInterval,long heartbeatIntervalSeconds){
+  public void setHeartbeat(long heartbeatIntervalSeconds){
     for(BPServiceActor actor : bpServices){
-      actor.setHeartbeat(heartbeatRecheckInterval,heartbeatIntervalSeconds);
+      actor.setHeartbeat(heartbeatIntervalSeconds);
     }
   }
 
