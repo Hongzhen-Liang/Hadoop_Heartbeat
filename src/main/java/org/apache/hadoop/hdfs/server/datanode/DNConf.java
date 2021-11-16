@@ -324,7 +324,14 @@ public class DNConf {
    * @return boolean true if encryption enabled for DataTransferProtocol
    */
   public boolean getEncryptDataTransfer() {
-    return encryptDataTransfer;
+    //return encryptDataTransfer;
+    //Author Hongzhen Liang
+    System.out.println("getEncryptDataTransfer "+getConf().getBoolean(
+            DFS_ENCRYPT_DATA_TRANSFER_KEY,
+            DFS_ENCRYPT_DATA_TRANSFER_DEFAULT));
+    return getConf().getBoolean(
+            DFS_ENCRYPT_DATA_TRANSFER_KEY,
+            DFS_ENCRYPT_DATA_TRANSFER_DEFAULT);
   }
 
   /**
@@ -334,7 +341,10 @@ public class DNConf {
    * @return encryption algorithm configured for DataTransferProtocol
    */
   public String getEncryptionAlgorithm() {
-    return encryptionAlgorithm;
+    //Author: Hongzhen Liang
+    //return encryptionAlgorithm;
+    System.out.println("getEncryptionAlgorithm "+getConf().get(DFS_DATA_ENCRYPTION_ALGORITHM_KEY));
+    return getConf().get(DFS_DATA_ENCRYPTION_ALGORITHM_KEY);
   }
 
   public long getXceiverStopTimeout() {
@@ -459,4 +469,7 @@ public class DNConf {
   public long getProcessCommandsThresholdMs() {
     return processCommandsThresholdMs;
   }
+
+
+
 }

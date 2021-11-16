@@ -1232,6 +1232,7 @@ public class DFSConfigKeys extends CommonConfigurationKeys {
   public static final String DFS_ENCRYPT_DATA_TRANSFER_CIPHER_SUITES_KEY =
       HdfsClientConfigKeys.DFS_ENCRYPT_DATA_TRANSFER_CIPHER_SUITES_KEY;
   public static final String DFS_DATA_ENCRYPTION_ALGORITHM_KEY = "dfs.encrypt.data.transfer.algorithm";
+  public static final String DFS_DATA_ENCRYPTION_ALGORITHM_DEFAULT= "3des";
   @Deprecated
   public static final String DFS_TRUSTEDCHANNEL_RESOLVER_CLASS =
       HdfsClientConfigKeys.DFS_TRUSTEDCHANNEL_RESOLVER_CLASS;

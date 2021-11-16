@@ -46,6 +46,14 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_MAX_NUM_BLOCKS_TO_LOG_DEF
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_MAX_NUM_BLOCKS_TO_LOG_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_METRICS_LOGGER_PERIOD_SECONDS_DEFAULT;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_METRICS_LOGGER_PERIOD_SECONDS_KEY;
+
+// Author:Hongzhen Liang
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_ENCRYPT_DATA_TRANSFER_KEY;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_ENCRYPT_DATA_TRANSFER_DEFAULT;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_DEFAULT;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATA_ENCRYPTION_ALGORITHM_KEY;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATA_ENCRYPTION_ALGORITHM_DEFAULT;
 import static org.apache.hadoop.hdfs.protocol.datatransfer.BlockConstructionStage.PIPELINE_SETUP_APPEND_RECOVERY;
 import static org.apache.hadoop.hdfs.protocol.datatransfer.BlockConstructionStage.PIPELINE_SETUP_CREATE;
 import static org.apache.hadoop.hdfs.protocol.datatransfer.BlockConstructionStage.PIPELINE_SETUP_STREAMING_RECOVERY;
@@ -295,11 +303,15 @@ public class DataNode extends ReconfigurableBase
       "should be greater than or equal to -1";
 
   /** A list of property that are reconfigurable at runtime. */
+  //Author: Hongzhen
   private static final List<String> RECONFIGURABLE_PROPERTIES =
       Collections.unmodifiableList(
           Arrays.asList(
               DFS_DATANODE_DATA_DIR_KEY,
-              DFS_DATANODE_BALANCE_MAX_NUM_CONCURRENT_MOVES_KEY));
+              DFS_DATANODE_BALANCE_MAX_NUM_CONCURRENT_MOVES_KEY,
+              DFS_HEARTBEAT_INTERVAL_KEY,
+              DFS_ENCRYPT_DATA_TRANSFER_KEY,
+              DFS_DATA_ENCRYPTION_ALGORITHM_KEY));
 
   public static final Log METRICS_LOG = LogFactory.getLog("DataNodeMetricsLog");
 
@@ -606,6 +618,45 @@ public class DataNode extends ReconfigurableBase
           }
         }
         break;
+      }
+      //Author: Hongzhen Liang
+      case DFS_HEARTBEAT_INTERVAL_KEY:{
+        LOG.info("Reconfiguring {} to {}", property, newVal);
+        long interval;
+        if(newVal==null){
+          interval = DFS_HEARTBEAT_INTERVAL_DEFAULT;
+        }else{
+          interval = Long.valueOf(newVal);
+        }
+        System.out.println("modify interval "+interval);
+        //getConf().setLong(DFS_HEARTBEAT_INTERVAL_KEY,interval);
+        blockPoolManager.setHeartbeat(interval);
+        return Long.toString(interval);
+      }
+      case DFS_ENCRYPT_DATA_TRANSFER_KEY: {
+          LOG.info("Reconfiguring {} to {}", property, newVal);
+          boolean encrypt;
+          if (newVal == null) {
+            // set to default
+            encrypt = DFS_ENCRYPT_DATA_TRANSFER_DEFAULT;
+          } else {
+            encrypt = Boolean.parseBoolean(newVal);
+          }
+          getConf().unset(DFS_ENCRYPT_DATA_TRANSFER_KEY);
+          getConf().set(DFS_ENCRYPT_DATA_TRANSFER_KEY,Boolean.toString(encrypt));
+          return Boolean.toString(encrypt);
+      }
+      case DFS_DATA_ENCRYPTION_ALGORITHM_KEY: {
+        LOG.info("Reconfiguring {} to {}", property, newVal);
+        String encryptionAlgorithm;
+        if(newVal == null){
+          encryptionAlgorithm = DFS_DATA_ENCRYPTION_ALGORITHM_DEFAULT;
+        }else{
+          encryptionAlgorithm = newVal;
+        }
+        getConf().unset(DFS_DATA_ENCRYPTION_ALGORITHM_KEY);
+        getConf().set(DFS_DATA_ENCRYPTION_ALGORITHM_KEY,encryptionAlgorithm);
+        return newVal;
       }
       default:
         break;
